@@ -1,3 +1,6 @@
+"use client";
+// 🕵️‍♂️ Zeigen: SSR gegen RSC, der Timer steht im HTML und trotzdem im JS-Bundle
+//   (Network-Tab, nach "Timer" suchen), RecipeDetails dagegen nur im HTML
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 

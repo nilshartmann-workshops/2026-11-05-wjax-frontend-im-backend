@@ -1,0 +1,63 @@
+{
+  "name": "nextjs-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "rm -rf .next && next dev -p 8110",
+    "dev:only": "next dev -p 8110",
+    "build:only": "next build",
+    "build": "rm -rf .next && next build",
+    "start": "next start -p 8110",
+    "lint": "eslint .",
+    "check": "rm -rf .next && prettier --write . && eslint . --fix && tsc --noEmit --skipLibCheck",
+    "check:lint": "eslint .",
+    "check:prettier": "prettier --check .",
+    "check:ts": "tsc --noEmit --skipLibCheck",
+    "clean": "rm -rf .next node_modules/.cache tsconfig.tsbuildinfo",
+    "generate": "kubb generate"
+  },
+  "dependencies": {
+    "bootstrap-icons": "^1.13.1",
+    "date-fns": "^3.6.0",
+    "next": "16.4.5",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "tailwind-merge": "^2.6.1",
+    "use-debounce": "^10.1.1",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@kubb/cli": "^3.18.3",
+    "@kubb/core": "^3.18.3",
+    "@kubb/oas": "^3.18.3",
+    "@kubb/plugin-oas": "^3.18.3",
+    "@kubb/plugin-ts": "^3.18.3",
+    "@kubb/plugin-zod": "^3.18.3",
+    "@next/eslint-plugin-next": "16.4.5",
+    "@tailwindcss/postcss": "^4.3.1",
+    "@types/node": "^20.19.43",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "baseline-browser-mapping": "^2.10.38",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "16.4.5",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-unused-imports": "^4.4.1",
+    "openapi-format": "^1.33.1",
+    "postcss": "^8.5.15",
+    "prettier": "^3.8.4",
+    "prettier-plugin-tailwindcss": "^0.6.14",
+    "rimraf": "^6.1.3",
+    "tailwindcss": "^4.3.1",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "pnpm@10.3.0+sha512.ee592eda8815a8a293c206bb0917c4bb0ff274c50def7cbc17be05ec641fc2d1b02490ce660061356bd0d126a4d7eb2ec8830e6959fb8a447571c631d5a2442d",
+  "pnpm": {
+    "overrides": {
+      "@types/react": "19.2.17",
+      "@types/react-dom": "19.2.3"
+    }
+  }
+}

@@ -1,0 +1,64 @@
+package nh.recipify.domain.model;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface FeedbackRepository extends Repository<Feedback, Long> {
+
+    @Deprecated
+    List<Feedback> getAllByRecipeIdAndApprovalStatusOrderByCreatedAtDesc(Long recipeId, ApprovalStatus status);
+
+    Page<Feedback> getFeedbackByRecipeIdAndApprovalStatusOrderByCreatedAtDesc(Long recipeId, ApprovalStatus status, Pageable pageable);
+
+    /**
+     * Für Admin API
+     *
+     * @param pageable
+     * @return
+     */
+    Page<Feedback> getFeedbackByOrderByUpdatedAtDesc(Pageable pageable);
+
+    Optional<Feedback> getById(Long id);
+
+
+    Feedback save(Feedback feedback);
+
+    void deleteById(Long id);
+
+    @Modifying
+    @Query(nativeQuery = true,
+        value = """
+                        update feedbacks set approval_status = :#{#approvalStatus.name()}, updated_at = now() where id = :id
+            """
+    )
+    void updateStatus(Long id, ApprovalStatus approvalStatus);
+
+    @Query(nativeQuery = true,
+        value = """
+                select avg(rating) from feedbacks where recipe_id = :recipeId
+            """)
+    float averageRating(Long recipeId);
+
+    public interface FeedbackCountProjection {
+        Long getApprovedCount();
+
+        Long getRejectedCount();
+
+        Long getPendingCount();
+    }
+
+    @Query(nativeQuery = true, value = """
+        SELECT
+          COUNT(CASE WHEN approval_status = 'APPROVED' THEN 1 END) AS approvedCount,
+          COUNT(CASE WHEN approval_status = 'REJECTED' THEN 1 END) AS rejectedCount,
+          COUNT(CASE WHEN approval_status = 'PENDING' THEN 1 END) AS pendingCount
+        FROM feedbacks WHERE recipe_id = :recipeId
+        """)
+    FeedbackCountProjection countByRecipeId(Long recipeId);
+}

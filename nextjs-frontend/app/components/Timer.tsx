@@ -1,0 +1,226 @@
+import React, { ChangeEvent, useEffect, useState } from "react";
+import { twMerge } from "tailwind-merge";
+
+import { Button } from "./Button.tsx";
+import { formatMinSeconds } from "./FormatMinuteDuration.tsx";
+import { Input } from "./Input.tsx";
+import { logRender } from "@/app/components/log-render.ts";
+
+type TimerState = {
+  state: "running" | "finished";
+  timerId: NodeJS.Timeout | null;
+  timeRemaining: number;
+};
+
+type TimeState = {
+  time: number;
+  hasChanged?: boolean;
+};
+
+// close and open on hover only works so-la-la
+// but should be good enough for demo purposes
+export function Timer() {
+  logRender("Timer");
+
+  const [open, setOpen] = useState(true);
+  const [canCloseOnLeave, setCanCloseOnLeave] = useState(true);
+  const [time, setTime] = useState<TimeState>({ time: 0 });
+  const [timer, setTimer] = useState<TimerState | null>();
+  const [hasFocus, setHasFocus] = useState(false);
+
+  const handleExpand = (open: boolean) => {
+    if (open) {
+      setOpen(true);
+      return;
+    }
+    if (canCloseOnLeave) {
+      setOpen(false);
+    }
+  };
+
+  const onTimeChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const newTime = parseInt(e.target.value);
+    setTime((prevTime) => ({
+      hasChanged: prevTime.time !== newTime && newTime !== 0,
+      time: newTime,
+    }));
+
+    setTimer(null);
+  };
+
+  const couldCloseOnLeave = !time.hasChanged && !timer && !hasFocus;
+
+  const activationProps = {
+    onFocus: () => {
+      setHasFocus(true);
+      setCanCloseOnLeave(false);
+    },
+    onBlur: () => {
+      setHasFocus(false);
+      setCanCloseOnLeave(true);
+    },
+    onMouseEnter: () => {
+      setCanCloseOnLeave(false);
+    },
+    onMouseLeave: () => {
+      if (couldCloseOnLeave) {
+        setCanCloseOnLeave(true);
+      }
+    },
+  };
+
+  const onStartTimer = () => {
+    if (timer?.timerId) {
+      clearInterval(timer?.timerId);
+    }
+
+    // when timer is started, both input field and start button are removed
+    // so we can not have focus anymore (even we won't receive onBlur in this case)
+    setHasFocus(false);
+
+    if (time.time === 0) {
+      return;
+    }
+
+    const id = setInterval(() => {
+      setTimer((prevTimer) => {
+        if (!prevTimer) {
+          return null;
+        }
+        return {
+          ...prevTimer,
+          timeRemaining:
+            prevTimer.timeRemaining > 1 ? prevTimer.timeRemaining - 1 : 0,
+        };
+      });
+    }, 1000);
+
+    setTimer({
+      state: "running",
+      timeRemaining: time.time * 60,
+      timerId: id,
+    });
+  };
+
+  const onCancelTimer = () => {
+    if (!timer) {
+      return;
+    }
+    if (timer.timerId) {
+      clearInterval(timer.timerId);
+    }
+    setTimer(null);
+    setHasFocus(false);
+  };
+
+  useEffect(() => {
+    if (!timer) {
+      return;
+    }
+    if (timer.timeRemaining <= 0 && timer.timerId) {
+      clearInterval(timer.timerId);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setTimer({ state: "finished", timerId: null, timeRemaining: 0 });
+    }
+  }, [timer]);
+
+  useEffect(() => {
+    return () => {
+      if (timer?.timerId) {
+        clearInterval(timer?.timerId);
+      }
+    };
+  }, [timer?.timerId]);
+
+  const timerUi =
+    timer?.state === "running"
+      ? "running"
+      : timer?.state === "finished"
+        ? "finished"
+        : "edit";
+
+  const buttonEnabled = time.time > 0;
+
+  return (
+    <div
+      onMouseEnter={() => handleExpand(true)}
+      onMouseLeave={() => handleExpand(false)}
+      className={twMerge(
+        "font-barlow flex items-center rounded-sm bg-white ps-2 pe-2",
+        timer?.state === "finished" && "bg-green",
+      )}
+    >
+      {open && (
+        <>
+          {timerUi === "finished" && (
+            <div className={"me-2 text-white"}>Finished</div>
+          )}
+          {timerUi === "finished" || (
+            <div className={"me-2 text-gray-500"}>Timer</div>
+          )}
+
+          {timerUi === "edit" && (
+            <>
+              <div className={"max-w-16"}>
+                <Input
+                  name={"time"}
+                  type={"number"}
+                  value={time.time}
+                  onChange={onTimeChange}
+                  min={0}
+                  max={300}
+                  {...activationProps}
+                />
+              </div>
+              <span className={"ms-1 me-2"}>{" min "}</span>
+              <div className={"ms-2 me-2"}>
+                <Button disabled={!buttonEnabled}>
+                  <button
+                    onClick={onStartTimer}
+                    {...activationProps}
+                    name={"startBtn"}
+                  >
+                    Start
+                  </button>
+                </Button>
+              </div>
+            </>
+          )}
+          {timerUi === "running" && (
+            <>
+              <div className={"me-2 w-8 font-bold text-gray-500"}>
+                {formatMinSeconds(timer?.timeRemaining || 0)}
+              </div>
+              <div className={"ms-2 me-2"}>
+                <Button disabled={!buttonEnabled}>
+                  <button onClick={onCancelTimer} name={"cancelBtn"}>
+                    Cancel
+                  </button>
+                </Button>
+              </div>
+            </>
+          )}
+          {timerUi === "finished" && (
+            <>
+              <div className={"me-2 w-8 font-bold text-white"}>
+                {formatMinSeconds(time.time * 60)}
+              </div>
+              <div className={"ms-2 me-2"}>
+                <Button disabled={!buttonEnabled}>
+                  <button onClick={onCancelTimer} name={"resetBtn"}>
+                    Reset
+                  </button>
+                </Button>
+              </div>
+            </>
+          )}
+        </>
+      )}
+      <Button>
+        <button onClick={() => setOpen((o) => !o)}>
+          <i className="fa-solid fa-hourglass-start"></i>
+        </button>
+      </Button>
+    </div>
+  );
+}

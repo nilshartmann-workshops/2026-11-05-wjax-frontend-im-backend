@@ -1,0 +1,38 @@
+pnpm-lock.yaml
+
+public/assets
+
+# Assets
+app/assets
+
+tsconfig.json
+.eslintrc.cjs
+index.html
+
+# Docs / Markdown
+CLAUDE.md
+AGENTS.md
+README.md
+docs/
+
+# Übernommener Skill (1:1, nicht von Prettier anfassen lassen)
+.claude/
+
+# Gemanagte Sandbox-Config (gesynkt, nicht von Prettier anfassen lassen)
+.claude-sandbox/
+
+# Generated:
+public/fontawesome/
+generated-api-doc.yaml
+api-docs.yaml
+api-docs-full.yaml
+public/fonts/google-fonts.css
+
+public/favicons/
+public/images/
+
+
+routeTree.gen.ts
+
+docker-compose.yaml
+next.config.mjs

@@ -1,3 +1,6 @@
+// 🕵️‍♂️ Zeigen: fetchRecipe in Timer.tsx importieren, der Build bricht ab
+import "server-only";
+
 import {
   AddFeedbackMutationResponse,
   GetExploreRecipesQueryResponse,
@@ -24,7 +27,11 @@ const backendUrl = process.env.BACKEND_URL ?? "http://localhost:63080";
 function backendFetch(path: string, method = "GET", body?: unknown) {
   return fetch(`${backendUrl}/${path}`, {
     method,
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      // 🕵️‍♂️ Erzählen: ohne "server-only" landet dieser Code im Bundle des Browsers
+      Authorization: `Bearer ${process.env.BACKEND_TOKEN}`,
+    },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
 }

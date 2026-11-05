@@ -1,7 +1,11 @@
+import { Metadata } from "next";
 import { Suspense } from "react";
 
 import LoadingIndicator from "@/app/components/LoadingIndicator.tsx";
-import { fetchExploreRecipes } from "@/app/components/queries-neu.ts";
+import {
+  fetchExploreRecipes,
+  fetchRecipe,
+} from "@/app/components/queries-neu.ts";
 import { RenderedAt } from "@/app/components/RenderedAt.tsx";
 import { CacheableRecipeDetails } from "@/app/components/recipepage/CacheableRecipeDetails.tsx";
 import ExploreRecipeSlider from "@/app/components/recipepage/ExploreRecipeSlider.tsx";
@@ -9,6 +13,23 @@ import ExploreRecipeSlider from "@/app/components/recipepage/ExploreRecipeSlider
 type RecipePageProps = {
   params: Promise<{ recipeId: string }>;
 };
+
+// 🕵️‍♂️ Zeigen: Quelltext der Seite, Titel und Beschreibung stehen im <head>
+export async function generateMetadata({
+  params,
+}: RecipePageProps): Promise<Metadata> {
+  const { recipeId } = await params;
+  const recipe = await fetchRecipe(recipeId);
+
+  if (!recipe) {
+    return { title: "Rezept nicht gefunden" };
+  }
+
+  return {
+    title: recipe.recipe.title,
+    description: recipe.recipe.headline,
+  };
+}
 
 export default async function RecipePage({ params }: RecipePageProps) {
   const { recipeId } = await params;

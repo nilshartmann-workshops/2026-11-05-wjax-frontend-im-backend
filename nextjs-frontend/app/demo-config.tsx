@@ -3,7 +3,8 @@
 export const slowDown_IncreaseLikes = 1200;
 export const slowDown_GetFeedbacks = 0;
 
-export const slowDown_GetExploreRecipes = 0;
+// 🕵️‍♂️ Zeigen: Explore antwortet langsam, die ganze Seite wartet
+export const slowDown_GetExploreRecipes = 1200;
 export const slowDown_GetRecipe = 0;
 
 // Für Request-Demo auf 0 setzen:

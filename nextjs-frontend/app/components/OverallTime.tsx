@@ -1,3 +1,4 @@
+"use client";
 import { formatMinuteDuration } from "@/app/components/FormatMinuteDuration.tsx";
 import { useSkillContext } from "@/app/components/SkillContext.tsx";
 
@@ -9,9 +10,8 @@ export default function OverallTime({
   cookTime,
   preparationTime,
 }: OverallTimeProps) {
-  const userPreparationTime = preparationTime;
-  // todo calculate time based on context:
-  // const userPreparationTime = useSkillContext().calculateTime(preparationTime);
+  // 🕵️‍♂️ Erzählen: liest den globalen State, deshalb "use client"
+  const userPreparationTime = useSkillContext().calculateTime(preparationTime);
   return (
     <p className="border-green text-green me-2 inline-block rounded-sm border bg-white p-2 text-[15px]">
       <i className="fa-regular fa-clock mr-2"></i>

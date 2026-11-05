@@ -1,3 +1,4 @@
+"use client";
 import { useSkillContext } from "@/app/components/SkillContext.tsx";
 
 import { formatMinuteDuration } from "../FormatMinuteDuration";
@@ -8,9 +9,7 @@ type CookingTimeProps = {
 };
 
 export function CookingTime({ cookTime, preparationTime }: CookingTimeProps) {
-  const userPreprationTime = preparationTime;
-  // todo: use context to calculate userPreparationTime
-  // const userPreprationTime = useSkillContext().calculateTime(preparationTime);
+  const userPreprationTime = useSkillContext().calculateTime(preparationTime);
 
   return (
     <div

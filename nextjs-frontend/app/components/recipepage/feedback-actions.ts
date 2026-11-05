@@ -1,5 +1,9 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
+import { saveFeedback } from "@/app/components/queries-neu.ts";
+
 export type FeedbackFormState =
   | { result?: never; errors?: never }
   | { result: "success"; errors?: never }
@@ -16,7 +20,21 @@ export const feedbackFormAction: FeedbackFormAction = async (
 ) => {
   console.log("feedbackFormAction :: prevState", prevState, formData);
 
-  // todo: Formulardaten mit saveFeedback an das Backend schicken
+  const recipeId = String(formData.get("recipeId"));
 
-  return {};
+  // 🕵️‍♂️ Erzählen: keine eigene Prüfung, die Regeln stehen im Java-Record NewFeedback
+  const saved = await saveFeedback(recipeId, {
+    commenter: String(formData.get("commenter")),
+    stars: Number(formData.get("stars")),
+    comment: String(formData.get("comment")),
+  });
+
+  if ("errors" in saved) {
+    // 🕵️‍♂️ Zeigen: Name mit zwei Buchstaben absenden, die Meldung kommt aus der Bean Validation
+    return { result: "error", errors: saved.errors };
+  }
+
+  revalidatePath(`/recipes/${recipeId}`);
+
+  return { result: "success" };
 };

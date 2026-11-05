@@ -1,13 +1,10 @@
-import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import LoadingIndicator from "@/app/components/LoadingIndicator.tsx";
-import {
-  fetchExploreRecipes,
-  fetchRecipe,
-} from "@/app/components/queries-neu.ts";
+import { fetchExploreRecipes } from "@/app/components/queries-neu.ts";
+import { RenderedAt } from "@/app/components/RenderedAt.tsx";
+import { CacheableRecipeDetails } from "@/app/components/recipepage/CacheableRecipeDetails.tsx";
 import ExploreRecipeSlider from "@/app/components/recipepage/ExploreRecipeSlider.tsx";
-import RecipeDetails from "@/app/components/recipepage/RecipeDetails.tsx";
 
 type RecipePageProps = {
   params: Promise<{ recipeId: string }>;
@@ -20,19 +17,13 @@ export default async function RecipePage({ params }: RecipePageProps) {
   // 🕵️‍♂️ Zeigen: ohne await, das Rezept kommt sofort, Explore wird nachgestreamt
   const exploreRecipesPromise = fetchExploreRecipes(recipeId);
 
-  // 🕵️‍♂️ Zeigen: Spring-Log, Aufrufer ist jetzt (node) statt des Browsers
-  const recipe = await fetchRecipe(recipeId);
-
-  if (!recipe) {
-    return notFound();
-  }
-
   // 🕵️‍♂️ Zeigen: Quelltext der Seite, das Rezept steht im HTML
   return (
-    <RecipeDetails recipe={recipe.recipe}>
+    <CacheableRecipeDetails recipeId={recipeId}>
       <Suspense fallback={<LoadingIndicator />}>
+        <RenderedAt label={"Explore"} />
         <ExploreRecipeSlider exploreRecipesPromise={exploreRecipesPromise} />
       </Suspense>
-    </RecipeDetails>
+    </CacheableRecipeDetails>
   );
 }

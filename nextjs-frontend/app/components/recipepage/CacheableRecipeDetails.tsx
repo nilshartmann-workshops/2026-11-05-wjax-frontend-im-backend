@@ -25,6 +25,9 @@ export async function CacheableRecipeDetails({
   recipeId,
   children,
 }: CacheableRecipeDetailsProps) {
+  // 🕵️‍♂️ Zeigen: zweimal laden, die Uhrzeit am Rezept bleibt stehen, die an Explore springt
+  "use cache";
+
   const recipe = await fetchRecipe(recipeId);
 
   if (!recipe) {

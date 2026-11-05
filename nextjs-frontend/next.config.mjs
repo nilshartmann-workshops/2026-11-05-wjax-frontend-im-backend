@@ -2,6 +2,7 @@ const backendUrl = process.env.BACKEND_URL ?? "http://localhost:63080";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  cacheComponents: true,
   reactStrictMode: false,
   logging: {
     fetches: {

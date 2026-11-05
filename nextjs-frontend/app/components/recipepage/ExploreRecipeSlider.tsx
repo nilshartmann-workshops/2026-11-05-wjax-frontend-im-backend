@@ -1,19 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 
 import { ExploreRecipeDto } from "@/app/_generated";
 import { ArrowButton } from "@/app/components/Button.tsx";
 import ExploreRecipeBox from "@/app/components/recipepage/ExploreRecipeBox.tsx";
 
 type ExploreRecipesProps = {
-  exploreRecipes: ExploreRecipeDto[];
+  exploreRecipesPromise: Promise<ExploreRecipeDto[]>;
 };
 
 export default function ExploreRecipeSlider({
-  exploreRecipes,
+  exploreRecipesPromise,
 }: ExploreRecipesProps) {
-  const recipes = exploreRecipes;
+  const recipes = use(exploreRecipesPromise);
   const [selected, setSelected] = useState(0);
 
   const recipe = recipes[selected];

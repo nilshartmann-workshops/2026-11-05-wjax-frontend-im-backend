@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
+import LoadingIndicator from "@/app/components/LoadingIndicator.tsx";
 import {
   fetchExploreRecipes,
   fetchRecipe,
@@ -15,7 +17,8 @@ export default async function RecipePage({ params }: RecipePageProps) {
   const { recipeId } = await params;
 
   // 🕵️‍♂️ Zeigen: die Seite wartet auf Explore, bevor sie das Rezept überhaupt lädt
-  const exploreRecipes = await fetchExploreRecipes(recipeId);
+  // 🕵️‍♂️ Zeigen: ohne await, das Rezept kommt sofort, Explore wird nachgestreamt
+  const exploreRecipesPromise = fetchExploreRecipes(recipeId);
 
   // 🕵️‍♂️ Zeigen: Spring-Log, Aufrufer ist jetzt (node) statt des Browsers
   const recipe = await fetchRecipe(recipeId);
@@ -27,7 +30,9 @@ export default async function RecipePage({ params }: RecipePageProps) {
   // 🕵️‍♂️ Zeigen: Quelltext der Seite, das Rezept steht im HTML
   return (
     <RecipeDetails recipe={recipe.recipe}>
-      <ExploreRecipeSlider exploreRecipes={exploreRecipes} />
+      <Suspense fallback={<LoadingIndicator />}>
+        <ExploreRecipeSlider exploreRecipesPromise={exploreRecipesPromise} />
+      </Suspense>
     </RecipeDetails>
   );
 }
